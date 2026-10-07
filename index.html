@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ABQA.NET</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:10px 14px;background:#1769e0;color:#fff}
+.wrap{display:flex;min-height:100vh}.side{width:235px;background:#102a56;color:#fff;padding:20px}.brand{font-size:23px;font-weight:700;margin-bottom:25px}.nav button{display:block;width:100%;text-align:left;background:transparent;margin:4px 0}.nav button:hover,.nav .on{background:#1e4d91}.main{flex:1;padding:25px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{background:#fff;padding:18px;border-radius:14px;box-shadow:0 3px 15px #0000000b}.num{font-size:28px;font-weight:700;margin-top:8px}.panel{background:#fff;padding:20px;border-radius:14px;margin-top:18px;box-shadow:0 3px 15px #0000000b}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.grid input,.grid select{width:100%;padding:10px;border:1px solid #ccd5e2;border-radius:8px}.table{width:100%;border-collapse:collapse;margin-top:15px}.table th,.table td{padding:11px;border-bottom:1px solid #e7ebf0;text-align:left}.badge{padding:5px 8px;border-radius:20px;background:#e8f1ff;color:#1769e0;font-size:12px}.hidden{display:none}.login{max-width:400px;margin:12vh auto;background:#fff;padding:30px;border-radius:16px;box-shadow:0 8px 35px #0002}.login input{width:100%;padding:12px;margin:7px 0 12px;border:1px solid #ccd5e2;border-radius:8px}.danger{background:#d93025}.muted{color:#687386;font-size:13px}@media(max-width:800px){.side{width:70px;padding:10px}.brand{font-size:0}.brand:after{content:'A';font-size:25px}.nav button{font-size:0;text-align:center}.nav button:before{content:'•';font-size:22px}.main{padding:12px}.cards,.grid{grid-template-columns:1fr 1fr}.table{font-size:12px}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+<h1>ABQA.NET</h1><p class="muted">Sistem Voucher WiFi</p>
+<input id="user" placeholder="Username" value="admin">
+<input id="pass" type="password" placeholder="Password" value="admin123">
+<button onclick="login()" style="width:100%">Masuk</button>
+<p id="err" style="color:#d93025"></p>
+</div>
+<div id="app" class="wrap hidden">
+<aside class="side"><div class="brand">ABQA.NET</div><div class="nav">
+<button class="on" onclick="page('dash',this)">Dashboard</button>
+<button onclick="page('voucher',this)">Voucher</button>
+<button onclick="page('jual',this)">Penjualan</button>
+<button onclick="page('server',this)">Server</button>
+<button onclick="page('paket',this)">Paket</button>
+<button onclick="page('kasir',this)">Kasir</button>
+<button onclick="page('laporan',this)">Laporan</button>
+<button onclick="logout()">Keluar</button>
+</div></aside>
+<main class="main">
+<div class="top"><div><h2 id="title">Dashboard</h2><span class="muted">ABQA.NET — aplikasi web lokal</span></div><span id="who" class="badge"></span></div>
+<section id="dash" class="page">
+<div class="cards"><div class="card">Voucher Ready<div class="num" id="ready">0</div></div><div class="card">Terjual<div class="num" id="sold">0</div></div><div class="card">Kasir<div class="num" id="kasirs">0</div></div><div class="card">Server<div class="num" id="servers">0</div></div></div>
+<div class="panel"><h3>Aktivitas</h3><div id="activity" class="muted">Belum ada penjualan.</div></div>
+</section>
+<section id="voucher" class="page hidden"><div class="panel"><h3>Tambah Voucher</h3><div class="grid">
+<select id="vserver"></select><select id="vpaket"></select><input id="vkode" placeholder="Kode voucher"><input id="vpass" placeholder="Password">
+</div><br><button onclick="addVoucher()">Simpan Voucher</button> <button onclick="bulkVoucher()">Input Bulk</button></div>
+<div class="panel"><h3>Stok Voucher</h3><table class="table"><thead><tr><th>Kode</th><th>Server</th><th>Paket</th><th>Harga</th><th>Status</th></tr></thead><tbody id="vtable"></tbody></table></div></section>
+<section id="jual" class="page hidden"><div class="panel"><h3>Jual Voucher</h3><div class="grid"><select id="sellv"></select><input id="customer" placeholder="Nama pelanggan"><button onclick="sell()" >Jual</button></div></div></section>
+<section id="server" class="page hidden"><div class="panel"><h3>Server MikroTik</h3><div class="grid"><input id="sname" placeholder="Nama server"><input id="sip" placeholder="IP/Identitas"><button onclick="addServer()">Tambah Server</button></div><table class="table"><tbody id="stable"></tbody></table></div></section>
+<section id="paket" class="page hidden"><div class="panel"><h3>Paket Voucher</h3><div class="grid"><input id="pname" placeholder="Nama paket"><input id="price" type="number" placeholder="Harga"><input id="comm" type="number" placeholder="Komisi"><button onclick="addPackage()">Tambah Paket</button></div><table class="table"><tbody id="ptable"></tbody></table></div></section>
+<section id="kasir" class="page hidden"><div class="panel"><h3>Kasir / Pengguna</h3><div class="grid"><input id="uname" placeholder="Username kasir"><input id="upass" placeholder="Password"><select id="urole"><option>Kasir</option><option>Admin</option></select><button onclick="addCashier()">Tambah</button></div><table class="table"><tbody id="utable"></tbody></table></div></section>
+<section id="laporan" class="page hidden"><div class="panel"><h3>Laporan Penjualan</h3><button onclick="exportCSV()">Export CSV</button><button onclick="window.print()" style="margin-left:8px">Cetak</button><table class="table"><tbody id="rtable"></tbody></table></div></section>
+</main></div>
+<script>
+const KEY='abqa_single_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{
+users:[{u:'admin',p:'admin123',role:'Admin'},{u:'maria',p:'maria123',role:'Kasir'}],
+servers:['RTR-001 Nangawoja','RTR-002 Labuan Taur','RTR-003 Peji','RTR-004 Konggang','RTR-005 Dintor','RTR-006 Nanga Ramut','RTR-007 Nanga Paang','RTR-008 Lamba'],
+packages:[['12 Jam',5000,3000],['2 Hari',10000,5000],['7 Hari',30000,8000],['30 Hari',70000,10000]],
+vouchers:[],sales:[]
+}; let me=null;
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function login(){let u=user.value,p=pass.value;me=db.users.find(x=>x.u===u&&x.p===p);if(!me){err.textContent='Username atau password salah';return}loginEl();render()}
+function loginEl(){login.classList.add('hidden');app.classList.remove('hidden');who.textContent=me.u+' — '+me.role}
+function logout(){location.reload()}
+function page(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));b&&b.classList.add('on');title.textContent=b?b.textContent:id}
+function render(){
+ready.textContent=db.vouchers.filter(x=>x.status==='READY').length;sold.textContent=db.sales.length;kasirs.textContent=db.users.filter(x=>x.role==='Kasir').length;servers.textContent=db.servers.length;
+vserver.innerHTML=db.servers.map(x=>`<option>${x}</option>`).join('');vpaket.innerHTML=db.packages.map(x=>`<option>${x[0]}</option>`).join('');
+vtable.innerHTML=db.vouchers.map(x=>`<tr><td>${x.code}</td><td>${x.server}</td><td>${x.paket}</td><td>Rp ${x.price.toLocaleString('id-ID')}</td><td><span class=badge>${x.status}</span></td></tr>`).join('');
+sellv.innerHTML=db.vouchers.filter(x=>x.status==='READY').map((x,i)=>`<option value="${db.vouchers.indexOf(x)}">${x.code} — ${x.paket} — Rp ${x.price.toLocaleString('id-ID')}</option>`).join('');
+stable.innerHTML=db.servers.map(x=>`<tr><td>${x}</td></tr>`).join('');
+ptable.innerHTML=db.packages.map(x=>`<tr><td>${x[0]}</td><td>Rp ${x[1].toLocaleString('id-ID')}</td><td>Komisi Rp ${x[2].toLocaleString('id-ID')}</td></tr>`).join('');
+utable.innerHTML=db.users.map(x=>`<tr><td>${x.u}</td><td>${x.role}</td></tr>`).join('');
+rtable.innerHTML='<tr><th>Waktu</th><th>Voucher</th><th>Pelanggan</th><th>Kasir</th><th>Server</th><th>Harga</th></tr>'+db.sales.map(x=>`<tr><td>${x.time}</td><td>${x.code}</td><td>${x.customer}</td><td>${x.cashier}</td><td>${x.server}</td><td>Rp ${x.price.toLocaleString('id-ID')}</td></tr>`).join('');
+activity.innerHTML=db.sales.length?db.sales.slice(-5).reverse().map(x=>`${x.time} — ${x.cashier} menjual ${x.code} (${x.customer||'-'})`).join('<br>'):'Belum ada penjualan.';
+}
+function addVoucher(){if(!vkode.value||!vpass.value)return alert('Kode dan password wajib diisi');let p=db.packages.find(x=>x[0]===vpaket.value);db.vouchers.push({code:vkode.value.trim(),password:vpass.value.trim(),server:vserver.value,paket:p[0],price:p[1],status:'READY'});vkode.value='';vpass.value='';save()}
+function bulkVoucher(){let s=prompt('Masukkan satu voucher per baris dengan format KODE|PASSWORD');if(!s)return;let p=db.packages.find(x=>x[0]===vpaket.value);s.split(/\\n/).map(x=>x.trim()).filter(Boolean).forEach(line=>{let a=line.split('|');if(a.length>=2)db.vouchers.push({code:a[0],password:a[1],server:vserver.value,paket:p[0],price:p[1],status:'READY'})});save()}
+function sell(){let i=+sellv.value,x=db.vouchers[i];if(!x)return alert('Tidak ada voucher READY');x.status='SOLD';let c=customer.value||'Umum';db.sales.push({...x,customer:c,cashier:me.u,time:new Date().toLocaleString('id-ID')});customer.value='';save();alert('Voucher berhasil dijual')}
+function addServer(){if(!sname.value)return;db.servers.push(sname.value.trim()+(sip.value?' — '+sip.value.trim():''));sname.value='';sip.value='';save()}
+function addPackage(){if(!pname.value||!price.value)return;db.packages.push([pname.value,+price.value,+comm.value||0]);pname.value='';price.value='';comm.value='';save()}
+function addCashier(){if(!uname.value||!upass.value)return;db.users.push({u:uname.value,p:upass.value,role:urole.value});uname.value='';upass.value='';save()}
+function exportCSV(){let rows=[['Waktu','Voucher','Pelanggan','Kasir','Server','Paket','Harga'],...db.sales.map(x=>[x.time,x.code,x.customer,x.cashier,x.server,x.paket,x.price])];let csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='laporan-abqa.csv';a.click()}
+render();
+</script></body></html>
